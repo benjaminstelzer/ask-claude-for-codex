@@ -65,7 +65,11 @@ class AskClaudeTests(unittest.TestCase):
         ):
             ask_claude.configure_standard_streams()
 
-        for stream in streams:
+        self.assertEqual(
+            streams[0].calls,
+            [{"encoding": "utf-8-sig", "errors": "replace"}],
+        )
+        for stream in streams[1:]:
             self.assertEqual(
                 stream.calls,
                 [{"encoding": "utf-8", "errors": "replace"}],

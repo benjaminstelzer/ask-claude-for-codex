@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-03: Windows PowerShell UTF-8 input
+
+### Fixed
+
+- Set PowerShell's native pipeline output encoding to BOM-less UTF-8 before
+  every prompt pipe in the skill instructions and examples.
+- Prevented Windows PowerShell 5.1 from replacing German umlauts and other
+  non-ASCII prompt characters before the wrapper receives them.
+- Made wrapper input tolerate and remove the UTF-8 preamble that Windows
+  PowerShell 5.1 still emits at the start of a native pipeline.
+
+### Validation
+
+- Verified the documented setting and wrapper input together with
+  `powershell.exe` by piping German umlauts and a Unicode arrow into Python and
+  comparing their code points without a leading preamble.
+
 ## 2026-08-03: Robust Windows I/O and result handling
 
 ### Fixed

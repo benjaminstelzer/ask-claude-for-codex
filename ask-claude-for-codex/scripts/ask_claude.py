@@ -37,7 +37,11 @@ FALLBACK_CONFIG: dict[str, Any] = {
 
 
 def configure_standard_streams() -> None:
-    for stream in (sys.stdin, sys.stdout, sys.stderr):
+    input_reconfigure = getattr(sys.stdin, "reconfigure", None)
+    if callable(input_reconfigure):
+        input_reconfigure(encoding="utf-8-sig", errors="replace")
+
+    for stream in (sys.stdout, sys.stderr):
         reconfigure = getattr(stream, "reconfigure", None)
         if callable(reconfigure):
             reconfigure(encoding="utf-8", errors="replace")

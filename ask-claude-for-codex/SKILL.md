@@ -41,9 +41,12 @@ request for Opus 5 to the current `opus` alias; do not invent a full model ID.
 3. Write a self-contained prompt with the question, relevant paths, required
    output and boundaries. Include only context needed for the answer.
 4. Exclude credentials, tokens, private keys and unrelated personal data.
-5. Pipe the prompt through standard input. Never pass it as the positional
-   `claude` prompt argument; PowerShell quoting and long prompts are unreliable
-   on that path.
+5. In every PowerShell process that pipes a prompt, first set
+   `$OutputEncoding = New-Object System.Text.UTF8Encoding $false`. This prevents
+   Windows PowerShell 5.1 from replacing non-ASCII characters before Python
+   receives them. Then pipe the prompt through standard input. Never pass it as
+   the positional `claude` prompt argument; PowerShell quoting and long prompts
+   are unreliable on that path.
 6. For the first question in a Claude conversation, start a new persistent
    session and retain the returned `session_id` in the current Codex task.
 7. For every follow-up in that Claude conversation, pass the retained ID with
@@ -53,6 +56,7 @@ request for Opus 5 to the current `opus` alias; do not invent a full model ID.
 Invoke the bundled wrapper from PowerShell:
 
 ```powershell
+$OutputEncoding = New-Object System.Text.UTF8Encoding $false
 $prompt = @'
 Review the active implementation plan. Return concrete findings with paths,
 mechanisms, impact, and the smallest sufficient correction. Do not edit files.
@@ -64,6 +68,7 @@ $prompt | python <skill-dir>/scripts/ask_claude.py
 Override model or effort only when requested:
 
 ```powershell
+$OutputEncoding = New-Object System.Text.UTF8Encoding $false
 $prompt | python <skill-dir>/scripts/ask_claude.py --model opus --effort max
 ```
 
@@ -71,6 +76,7 @@ Continue the same Claude conversation with the `session_id` returned by the
 first call:
 
 ```powershell
+$OutputEncoding = New-Object System.Text.UTF8Encoding $false
 $followUp | python <skill-dir>/scripts/ask_claude.py --resume <session-id>
 ```
 
@@ -86,6 +92,7 @@ only when the user wants Claude's configured project instructions, skills,
 plugins, hooks, MCP servers or custom commands to participate:
 
 ```powershell
+$OutputEncoding = New-Object System.Text.UTF8Encoding $false
 $prompt | python <skill-dir>/scripts/ask_claude.py --with-customizations
 ```
 
