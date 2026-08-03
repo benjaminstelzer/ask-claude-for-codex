@@ -1,4 +1,4 @@
 interface:
   display_name: "Ask Claude for Codex"
   short_description: "Ask Claude with selectable model and effort"
-  default_prompt: "Use $ask-claude-for-codex to ask Claude for a read-only second opinion."
+  default_prompt: "Use $ask-claude-for-codex to ask Claude for a persistent read-only second opinion."
