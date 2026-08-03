@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-03: Skill-focused README
+
+### Changed
+
+- Removed direct wrapper commands, wrapper flags, JSON output details, internal
+  configuration resolution, the repository tree and license boilerplate from
+  the README.
+- Replaced implementation-level controls with natural-language examples for
+  model selection, one-time overrides, conversation handling and Claude
+  customizations.
+- Kept only installation, skill usage, editable defaults and user-relevant
+  safety boundaries.
+
 ## 2026-08-03: Configuration template and fallback
 
 ### Changed

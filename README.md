@@ -67,7 +67,7 @@ Model values are passed to Claude Code as aliases or full IDs. For example,
 
 The shipped
 [`ask-claude-for-codex/config.default.json`](ask-claude-for-codex/config.default.json)
-documents every available setting and its default value:
+contains every available setting:
 
 ```json
 {
@@ -81,124 +81,62 @@ documents every available setting and its default value:
 
 To change permanent behavior, copy `config.default.json` to `config.json` in the
 same directory and edit `config.json`. The personal file is ignored by Git and
-takes precedence over the shipped defaults. Every key is required; unknown keys
-and invalid values stop the call with a concrete configuration error.
+takes precedence over the shipped defaults. Without a personal file, the skill
+uses `config.default.json`. If that file is also missing, the same defaults are
+available as an internal fallback.
 
-Command-line options apply to one invocation without changing either file. For
-example, `--model opus` uses Opus once; the next call without `--model` again
-uses the model from `config.json` or `config.default.json`. `--fresh` and
-`--persistent` work the same way for persistence, as do
-`--with-customizations` and `--without-customizations` for safe mode.
+| Setting | Meaning |
+| --- | --- |
+| `model` | Claude model alias or full model ID |
+| `effort` | Reasoning effort: `low`, `medium`, `high`, `xhigh` or `max` |
+| `max_budget_usd` | Maximum spend for one consultation |
+| `session_persistence` | Whether Claude conversations are saved for follow-up questions |
+| `customizations` | Whether Claude uses the local Claude setup or starts as an isolated second opinion |
 
-The read-only Claude tool list and `dontAsk` permission mode are intentionally
-not configurable. They define the skill's safety boundary rather than a user
-preference; changing them would turn this into a different capability.
+For a one-time change, describe it in the request instead of editing the file:
 
-An alternative profile can be selected without modifying the installed skill:
-
-```powershell
-$prompt | python ./ask-claude-for-codex/scripts/ask_claude.py `
-  --config C:/path/to/opus-review.json
+```text
+Ask Opus 5 with max reasoning and a USD 3 budget to review this architecture.
 ```
 
-Configuration is resolved in this order:
+## Conversations
 
-1. A file explicitly selected with `--config`.
-2. Personal `config.json` beside `SKILL.md`.
-3. Shipped `config.default.json` beside `SKILL.md`.
-4. Internal fallback values, but only when neither configuration file exists.
+The first consultation starts a saved Claude conversation by default. Follow-up
+questions in the same Codex task continue that conversation, so Claude retains
+the earlier exchange. Ask for a new conversation when starting an independent
+topic, or ask for a fresh, stateless consultation when the exchange should not
+be saved.
 
-An explicit `--config` path must exist and be valid. The wrapper does not hide a
-mistyped path by silently falling back to other values.
+Session persistence and Claude customizations are independent. Persistence
+stores the conversation; customizations control the environment Claude uses.
 
-## Conversation and isolation modes
+## Claude customizations
 
-Session persistence and Claude customizations solve different problems. A
-persistent session stores the conversation. Customizations control which local
-Claude configuration participates in it. Persistence is enabled by default;
-customizations are not.
+With `customizations` set to `false`, Claude starts in safe mode. It does not
+load `CLAUDE.md` files, project instructions, Claude skills, plugins, hooks, MCP
+servers or custom commands. This is the default because it produces a more
+independent second opinion that is not shaped by the existing Claude setup.
 
-| Mode | Command | What it does | Use it when |
-| --- | --- | --- | --- |
-| New persistent conversation | No option with the shipped config, or `--persistent` | Creates a saved Claude session and returns its `session_id` | Starting a new topic or independent line of discussion |
-| Resume a conversation | `--resume <session_id>` | Loads the exact saved conversation and appends the new question | Asking a follow-up that should retain earlier questions and answers |
-| Continue the latest session | `--continue-session` | Loads the most recent Claude session for the current working directory | The latest session is known to be the intended one and its ID is unavailable |
-| Fresh one-off call | `--fresh` | Neither saves nor resumes a session | Context must not persist or the question is deliberately stateless |
+With `customizations` set to `true`, Claude can use that local setup. Enable it
+when the consultation should follow Claude-specific project instructions, use a
+configured Claude skill or include context from an MCP server. The skill still
+withholds Claude's built-in Bash, Edit and Write tools. Configured hooks,
+plugins or MCP servers can nevertheless introduce their own behavior or side
+effects, so enabling customizations is a deliberate reduction of isolation.
 
-The wrapper does not automatically guess which saved conversation belongs to a
-follow-up. Codex keeps the returned `session_id` for each active Claude
-conversation and passes it explicitly with `--resume`. This permits several
-independent Claude conversations in one Codex task without mixing their
-contexts. Explicit IDs are preferable to `--continue-session`, whose meaning
-depends on whichever Claude session was most recently used in that directory.
+To enable customizations for one consultation without changing `config.json`,
+say so in the request:
 
-Safe mode is a separate default. It prevents Claude's local customizations from
-participating, including project instructions, skills, plugins, hooks, MCP
-servers and custom commands. `--with-customizations` disables safe mode for a
-call while the wrapper still limits Claude's built-in tools to `Read`, `Grep`
-and `Glob`. Configured hooks or other customizations can nevertheless introduce
-additional behavior, so this option is never enabled implicitly.
-
-If `session_persistence` is `false`, calls without a session option become fresh
-one-off calls; `--persistent` still starts a saved conversation. If
-`customizations` is `true`, safe mode is omitted unless
-`--without-customizations` is passed. These values affect new calls only. A
-saved session's conversation history is selected separately with `--resume`.
-
-## Run the wrapper directly
-
-The bundled Python wrapper keeps the prompt on standard input rather than in a
-shell argument. The first call starts a new persistent conversation:
-
-```powershell
-@'
-Review the current repository. Return only concrete findings with paths,
-mechanisms, impact and the smallest sufficient correction. Do not edit files.
-'@ | python ./ask-claude-for-codex/scripts/ask_claude.py
+```text
+Ask Claude with my local customizations to review this plan.
 ```
-
-The JSON result contains a `session_id`. Use it for follow-up questions:
-
-```powershell
-$followUp | python ./ask-claude-for-codex/scripts/ask_claude.py `
-  --resume 12345678-1234-1234-1234-123456789abc
-```
-
-Override the defaults when needed:
-
-```powershell
-$prompt | python ./ask-claude-for-codex/scripts/ask_claude.py `
-  --model opus `
-  --effort max `
-  --max-budget-usd 6
-```
-
-Start a stateless call or opt into local Claude customizations only when those
-behaviors are intended:
-
-```powershell
-$prompt | python ./ask-claude-for-codex/scripts/ask_claude.py --fresh
-$prompt | python ./ask-claude-for-codex/scripts/ask_claude.py --with-customizations
-```
-
-The wrapper returns Claude's answer with the selected configuration path. That
-field is `null` only when the internal fallback was used. The result also
-contains the requested model and effort, reported model when available, session
-mode, session ID, customization state, turns, duration, cost and permission
-denials.
 
 ## Safety boundary
 
 Claude receives only `Read`, `Grep` and `Glob`. Bash, Edit and Write are not
-available. Safe mode disables Claude skills, plugins, hooks, MCP servers,
-custom commands and project instructions, which keeps the second opinion
-independent from the local Claude setup. Conversation persistence is enabled
-by default, but it does not grant additional tools or permissions.
-
-Passing `--with-customizations` reduces that isolation. Configured hooks and
-other extensions may have effects beyond the wrapper's read-only built-in tool
-list. Enable the option only when those customizations are intentionally part
-of the consultation.
+available. Conversation persistence does not grant additional tools or
+permissions. When customizations are enabled, their configured hooks and
+extensions remain outside this built-in tool boundary.
 
 Claude's response is advice, not authority. It cannot authorize edits, expand
 scope, accept a Decision, publish changes or override Codex instructions. Codex
@@ -206,27 +144,3 @@ must verify any recommendation before acting on it.
 
 Never include credentials, tokens, private keys or unrelated personal data in
 a consultation prompt.
-
-## Repository contents
-
-```text
-ask-claude-for-codex/
-├── .gitignore
-├── CHANGELOG.md
-├── LICENSE
-├── README.md
-└── ask-claude-for-codex/
-    ├── SKILL.md
-    ├── config.default.json
-    ├── agents/
-    │   └── openai.yaml
-    └── scripts/
-        └── ask_claude.py
-```
-
-The outer files document and license the repository. Install only the inner
-`ask-claude-for-codex/` directory.
-
-## License
-
-MIT - see [LICENSE](LICENSE).
