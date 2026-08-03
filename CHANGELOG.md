@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-03: Robust Windows I/O and result handling
+
+### Fixed
+
+- Configured the wrapper's standard streams as UTF-8 so non-ASCII prompts and
+  Claude answers do not become mojibake or fail under the Windows code page.
+- Rejected Claude JSON error payloads even when the CLI process exits with code
+  zero.
+- Rejected valid JSON that is not an object with a concise wrapper error instead
+  of an `AttributeError` traceback.
+- Kept command help available when a personal configuration is missing or
+  malformed; normal calls still fail on the configuration error.
+
+### Validation
+
+- Added focused regression tests for UTF-8 stream configuration, JSON shape,
+  error payloads and configuration-independent help.
+- Verified an exact UTF-8 stdin/stdout round trip for German umlauts and a
+  Unicode arrow while Python was forced to start with `cp1252`.
+- Confirmed the installed Claude Code 2.1.220 error payload uses `is_error`, an
+  `error_*` subtype, `terminal_reason` and an `errors` list.
+
 ## 2026-08-03: Skill-focused README
 
 ### Changed

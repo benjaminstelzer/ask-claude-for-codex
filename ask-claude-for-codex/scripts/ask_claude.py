@@ -36,6 +36,13 @@ FALLBACK_CONFIG: dict[str, Any] = {
 }
 
 
+def configure_standard_streams() -> None:
+    for stream in (sys.stdin, sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            reconfigure(encoding="utf-8", errors="replace")
+
+
 def positive_amount(value: str) -> float:
     amount = float(value)
     if not math.isfinite(amount) or amount <= 0:
@@ -113,10 +120,16 @@ def resolve_config(explicit_path: Path | None) -> tuple[Path | None, dict[str, A
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    raw_argv = list(sys.argv[1:] if argv is None else argv)
     config_parser = argparse.ArgumentParser(add_help=False)
     config_parser.add_argument("--config", type=Path)
-    config_args, _ = config_parser.parse_known_args(argv)
-    config_path, config = resolve_config(config_args.config)
+    config_args, _ = config_parser.parse_known_args(raw_argv)
+    try:
+        config_path, config = resolve_config(config_args.config)
+    except ValueError:
+        if not any(argument in ("-h", "--help") for argument in raw_argv):
+            raise
+        config_path, config = None, FALLBACK_CONFIG.copy()
 
     parser = argparse.ArgumentParser(
         description=(
@@ -197,7 +210,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.set_defaults(customizations_enabled=config["customizations"])
 
-    args = parser.parse_args(argv)
+    args = parser.parse_args(raw_argv)
     args.config_path = config_path
     args.session_persistence_default = config["session_persistence"]
     if args.session_name and session_mode(args) != "persistent":
@@ -232,6 +245,35 @@ def read_prompt() -> str:
 def optional_field(payload: dict[str, Any], name: str) -> Any:
     value = payload.get(name)
     return value if value not in ("", None) else None
+
+
+def parse_claude_result(raw_output: str) -> dict[str, Any]:
+    try:
+        payload = json.loads(raw_output)
+    except json.JSONDecodeError as error:
+        raise ValueError(f"Claude returned invalid JSON: {error}") from error
+    if not isinstance(payload, dict):
+        raise ValueError("Claude returned JSON that is not an object")
+    return payload
+
+
+def claude_error_details(payload: dict[str, Any]) -> str | None:
+    subtype = payload.get("subtype")
+    has_error_subtype = isinstance(subtype, str) and subtype.startswith("error")
+    if payload.get("is_error") is not True and not has_error_subtype:
+        return None
+
+    errors = payload.get("errors")
+    if isinstance(errors, list):
+        messages = [message for message in errors if isinstance(message, str)]
+        if messages:
+            return "; ".join(messages)
+
+    for key in ("result", "terminal_reason", "subtype"):
+        value = payload.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return "Claude reported an unspecified error"
 
 
 def session_mode(args: argparse.Namespace) -> str:
@@ -312,9 +354,17 @@ def run() -> int:
         return completed.returncode
 
     try:
-        claude_result = json.loads(completed.stdout)
-    except json.JSONDecodeError as error:
-        print(f"ask-claude: Claude returned invalid JSON: {error}", file=sys.stderr)
+        claude_result = parse_claude_result(completed.stdout)
+    except ValueError as error:
+        print(f"ask-claude: {error}", file=sys.stderr)
+        return 1
+
+    error_details = claude_error_details(claude_result)
+    if error_details is not None:
+        print(
+            f"ask-claude: Claude returned an error: {error_details}",
+            file=sys.stderr,
+        )
         return 1
 
     output = {
@@ -338,4 +388,5 @@ def run() -> int:
 
 
 if __name__ == "__main__":
+    configure_standard_streams()
     raise SystemExit(run())

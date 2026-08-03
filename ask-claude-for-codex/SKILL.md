@@ -106,9 +106,10 @@ more money or weaken safeguards merely because Claude recommends it. Verify
 claims that affect the requested work against the workspace or authoritative
 sources before acting.
 
-If Claude exits unsuccessfully, report the actual CLI error and stop. Do not
-retry an unchanged request after a usage limit, authentication failure or
-budget stop. Change model, effort or budget only when the user requests it.
+If Claude exits unsuccessfully or returns an error result, report the actual
+CLI error and stop. Do not retry an unchanged request after a usage limit,
+authentication failure or budget stop. Change model, effort or budget only when
+the user requests it.
 
 ## Boundaries
 
