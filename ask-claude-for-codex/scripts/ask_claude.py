@@ -17,13 +17,22 @@ from typing import Any
 EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
 READ_ONLY_TOOLS = "Read,Grep,Glob"
 MODEL_PATTERN = re.compile(r"^[A-Za-z0-9._:-]+$")
-DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.json"
+SKILL_DIR = Path(__file__).resolve().parent.parent
+USER_CONFIG_PATH = SKILL_DIR / "config.json"
+DEFAULT_CONFIG_PATH = SKILL_DIR / "config.default.json"
 CONFIG_KEYS = {
     "model",
     "effort",
     "max_budget_usd",
     "session_persistence",
     "customizations",
+}
+FALLBACK_CONFIG: dict[str, Any] = {
+    "model": "claude-fable-5",
+    "effort": "high",
+    "max_budget_usd": 10,
+    "session_persistence": True,
+    "customizations": False,
 }
 
 
@@ -93,11 +102,21 @@ def load_config(path: Path) -> dict[str, Any]:
     return payload
 
 
+def resolve_config(explicit_path: Path | None) -> tuple[Path | None, dict[str, Any]]:
+    if explicit_path is not None:
+        return explicit_path, load_config(explicit_path)
+    if USER_CONFIG_PATH.is_file():
+        return USER_CONFIG_PATH, load_config(USER_CONFIG_PATH)
+    if DEFAULT_CONFIG_PATH.is_file():
+        return DEFAULT_CONFIG_PATH, load_config(DEFAULT_CONFIG_PATH)
+    return None, FALLBACK_CONFIG.copy()
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     config_parser = argparse.ArgumentParser(add_help=False)
-    config_parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
+    config_parser.add_argument("--config", type=Path)
     config_args, _ = config_parser.parse_known_args(argv)
-    config = load_config(config_args.config)
+    config_path, config = resolve_config(config_args.config)
 
     parser = argparse.ArgumentParser(
         description=(
@@ -108,8 +127,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--config",
         type=Path,
-        default=config_args.config,
-        help=f"JSON defaults file (default: {DEFAULT_CONFIG_PATH})",
+        default=config_path,
+        help=(
+            "use a specific JSON config instead of config.json or "
+            "config.default.json"
+        ),
     )
     parser.add_argument(
         "--model",
@@ -176,6 +198,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.set_defaults(customizations_enabled=config["customizations"])
 
     args = parser.parse_args(argv)
+    args.config_path = config_path
     args.session_persistence_default = config["session_persistence"]
     if args.session_name and session_mode(args) != "persistent":
         parser.error(
@@ -295,7 +318,9 @@ def run() -> int:
         return 1
 
     output = {
-        "config_path": str(args.config.resolve()),
+        "config_path": (
+            str(args.config_path.resolve()) if args.config_path is not None else None
+        ),
         "requested_model": args.model,
         "requested_effort": args.effort,
         "session_mode": session_mode(args),

@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-08-03: Configuration template and fallback
+
+### Changed
+
+- Added a versioned `config.default.json` that documents all supported settings.
+- Added optional personal `config.json` support and excluded that file from Git.
+- Resolved configuration in a defined order: explicit file, personal file,
+  shipped default file, then internal fallback values only when both local files
+  are absent.
+- Clarified in the README that command-line options affect one invocation and
+  never modify configuration files.
+
+### Validation
+
+- The shipped default file supplied the documented Fable 5, high-effort,
+  USD 10, persistent and safe-mode defaults.
+- A temporary personal `config.json` took precedence without changing the
+  shipped file; command-line options changed the parsed call without changing
+  either file.
+- With both local configuration paths absent, the wrapper selected its internal
+  fallback values. A missing explicit `--config` path still failed visibly.
+
 ## 2026-08-03: Configurable conversations and customizations
 
 ### Changed

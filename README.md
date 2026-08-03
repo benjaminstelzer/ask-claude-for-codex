@@ -65,9 +65,9 @@ Model values are passed to Claude Code as aliases or full IDs. For example,
 
 ## Configure the defaults
 
-The editable
-[`ask-claude-for-codex/config.json`](ask-claude-for-codex/config.json) is the
-source of the wrapper defaults:
+The shipped
+[`ask-claude-for-codex/config.default.json`](ask-claude-for-codex/config.default.json)
+documents every available setting and its default value:
 
 ```json
 {
@@ -79,12 +79,16 @@ source of the wrapper defaults:
 }
 ```
 
-Edit this file to change permanent behavior. Every key is required; unknown
-keys and invalid values stop the call with a concrete configuration error.
-Model, effort and budget CLI options override the file for one invocation.
-`--fresh` or `--persistent` override its persistence setting, while
-`--with-customizations` or `--without-customizations` override its
-customization setting.
+To change permanent behavior, copy `config.default.json` to `config.json` in the
+same directory and edit `config.json`. The personal file is ignored by Git and
+takes precedence over the shipped defaults. Every key is required; unknown keys
+and invalid values stop the call with a concrete configuration error.
+
+Command-line options apply to one invocation without changing either file. For
+example, `--model opus` uses Opus once; the next call without `--model` again
+uses the model from `config.json` or `config.default.json`. `--fresh` and
+`--persistent` work the same way for persistence, as do
+`--with-customizations` and `--without-customizations` for safe mode.
 
 The read-only Claude tool list and `dontAsk` permission mode are intentionally
 not configurable. They define the skill's safety boundary rather than a user
@@ -96,6 +100,16 @@ An alternative profile can be selected without modifying the installed skill:
 $prompt | python ./ask-claude-for-codex/scripts/ask_claude.py `
   --config C:/path/to/opus-review.json
 ```
+
+Configuration is resolved in this order:
+
+1. A file explicitly selected with `--config`.
+2. Personal `config.json` beside `SKILL.md`.
+3. Shipped `config.default.json` beside `SKILL.md`.
+4. Internal fallback values, but only when neither configuration file exists.
+
+An explicit `--config` path must exist and be valid. The wrapper does not hide a
+mistyped path by silently falling back to other values.
 
 ## Conversation and isolation modes
 
@@ -167,10 +181,11 @@ $prompt | python ./ask-claude-for-codex/scripts/ask_claude.py --fresh
 $prompt | python ./ask-claude-for-codex/scripts/ask_claude.py --with-customizations
 ```
 
-The wrapper returns Claude's answer with the selected configuration path,
-requested model, requested effort, reported model when available, session mode,
-session ID, customization state, turns, duration, cost and permission denials
-as JSON.
+The wrapper returns Claude's answer with the selected configuration path. That
+field is `null` only when the internal fallback was used. The result also
+contains the requested model and effort, reported model when available, session
+mode, session ID, customization state, turns, duration, cost and permission
+denials.
 
 ## Safety boundary
 
@@ -196,12 +211,13 @@ a consultation prompt.
 
 ```text
 ask-claude-for-codex/
+├── .gitignore
 ├── CHANGELOG.md
 ├── LICENSE
 ├── README.md
 └── ask-claude-for-codex/
     ├── SKILL.md
-    ├── config.json
+    ├── config.default.json
     ├── agents/
     │   └── openai.yaml
     └── scripts/

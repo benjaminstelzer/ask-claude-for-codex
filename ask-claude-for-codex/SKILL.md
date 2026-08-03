@@ -22,10 +22,13 @@ Use these values unless the user provides different ones:
 - Session persistence: enabled
 - Claude customizations: disabled through safe mode
 
-These defaults come from the editable `config.json` beside this `SKILL.md`, not
-from the Python wrapper. Change that file to set permanent defaults. Use
-`--config <path>` to select another configuration profile for one call. Command
-line options override the selected configuration.
+The shipped `config.default.json` beside this `SKILL.md` documents these values.
+For personal defaults, copy it to `config.json` and edit that copy. Resolve
+configuration in this order: an explicit `--config <path>`, personal
+`config.json`, shipped `config.default.json`, then the wrapper's internal
+fallback values when neither file exists. A missing explicit `--config` path is
+an error. Command-line options change one invocation without modifying either
+configuration file.
 
 Accept `low`, `medium`, `high`, `xhigh` or `max` as effort values. Pass a
 user-supplied Claude model alias or full model ID unchanged. Map an unqualified
