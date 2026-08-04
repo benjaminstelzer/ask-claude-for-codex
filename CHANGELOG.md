@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-04: Public wrapper verification
+
+### Added
+
+- Added a GitHub Actions workflow that runs the deterministic Python wrapper
+  tests on Linux and Windows.
+- Added the workflow status to the README without presenting it as a test of
+  Claude response quality.
+
 ## 2026-08-03: Windows PowerShell UTF-8 input
 
 ### Fixed

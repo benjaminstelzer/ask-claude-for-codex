@@ -2,6 +2,8 @@
 
 Give Codex a second opinion from Claude without leaving the task.
 
+[![Test](https://github.com/benjaminstelzer/ask-claude-for-codex/actions/workflows/test.yml/badge.svg)](https://github.com/benjaminstelzer/ask-claude-for-codex/actions/workflows/test.yml)
+
 Ask Claude for Codex is an Agent Skill that calls the locally authenticated
 Claude Code CLI from Codex. It is useful for independent reviews, critiques,
 comparisons and alternative analyses of the current workspace. The consulted
