@@ -16,7 +16,7 @@ Use these values unless the user provides different ones:
 - Model: `claude-fable-5`
 - Effort: `high`
 - Budget ceiling: USD 10
-- Tools: `Read,Grep,Glob`
+- Tools: `Read,Grep,Glob,WebSearch,WebFetch`
 - Permission mode: `dontAsk`
 - Output: JSON
 - Session persistence: enabled
@@ -41,6 +41,8 @@ request for Opus 5 to the current `opus` alias; do not invent a full model ID.
 3. Write a self-contained prompt with the question, relevant paths, required
    output and boundaries. Include only context needed for the answer.
 4. Exclude credentials, tokens, private keys and unrelated personal data.
+   Web searches and fetched URLs leave the local machine, so never include
+   private source text or secret-bearing URLs in a research request.
 5. In every PowerShell process that pipes a prompt, first set
    `$OutputEncoding = New-Object System.Text.UTF8Encoding $false`. This prevents
    Windows PowerShell 5.1 from replacing non-ASCII characters before Python
@@ -120,9 +122,11 @@ the user requests it.
 
 ## Boundaries
 
-Keep Claude read-only. This skill deliberately exposes no Bash, Edit or Write
-tool to the consulted model. Codex may implement a recommendation afterward
-only when the user's request independently authorizes that work.
+Keep Claude read-only. This skill exposes local `Read`, `Grep` and `Glob` plus
+the read-only research tools `WebSearch` and `WebFetch`. It deliberately
+exposes no Bash, Edit or Write tool to the consulted model. Codex may implement
+a recommendation afterward only when the user's request independently
+authorizes that work.
 
 Session persistence stores conversation context but does not enable write
 tools. The shipped configuration enables safe mode. `--with-customizations`

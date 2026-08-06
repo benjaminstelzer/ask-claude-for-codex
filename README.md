@@ -57,7 +57,7 @@ Unless overridden, the skill uses:
 | Model | `claude-fable-5` |
 | Reasoning effort | `high` |
 | Budget ceiling | USD 10 |
-| Claude tools | `Read,Grep,Glob` |
+| Claude tools | `Read,Grep,Glob,WebSearch,WebFetch` |
 | Session persistence | Enabled |
 | Claude customizations | Disabled with safe mode |
 
@@ -135,10 +135,13 @@ Ask Claude with my local customizations to review this plan.
 
 ## Safety boundary
 
-Claude receives only `Read`, `Grep` and `Glob`. Bash, Edit and Write are not
-available. Conversation persistence does not grant additional tools or
-permissions. When customizations are enabled, their configured hooks and
-extensions remain outside this built-in tool boundary.
+Claude receives only `Read`, `Grep`, `Glob`, `WebSearch` and `WebFetch`. This
+allows independent web research without exposing Bash, Edit or Write. Search
+queries and fetched URLs leave the local machine, so consultations must not
+contain secrets, private source text or secret-bearing URLs. Conversation
+persistence does not grant additional tools or permissions. When
+customizations are enabled, their configured hooks and extensions remain
+outside this built-in tool boundary.
 
 Claude's response is advice, not authority. It cannot authorize edits, expand
 scope, accept a Decision, publish changes or override Codex instructions. Codex

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from argparse import Namespace
 import contextlib
 import importlib.util
 import io
@@ -118,6 +119,29 @@ class AskClaudeTests(unittest.TestCase):
     def test_success_payload_is_not_an_error(self) -> None:
         payload = {"is_error": False, "subtype": "success", "result": "OK"}
         self.assertIsNone(ask_claude.claude_error_details(payload))
+
+    def test_command_exposes_read_and_web_tools_but_no_mutating_tools(self) -> None:
+        args = Namespace(
+            model="claude-fable-5",
+            effort="high",
+            max_budget_usd=10,
+            fresh=True,
+            resume=None,
+            continue_session=False,
+            persistent=False,
+            session_persistence_default=True,
+            session_name=None,
+            customizations_enabled=False,
+        )
+
+        command = ask_claude.build_command(args, ["claude"])
+        expected_tools = "Read,Grep,Glob,WebSearch,WebFetch"
+        self.assertEqual(command[command.index("--tools") + 1], expected_tools)
+        self.assertEqual(
+            command[command.index("--allowed-tools") + 1], expected_tools
+        )
+        for mutating_tool in ("Bash", "Edit", "Write"):
+            self.assertNotIn(mutating_tool, expected_tools)
 
     def test_help_survives_a_configuration_error(self) -> None:
         with (

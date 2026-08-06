@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-06: Read-only web research
+
+### Fixed
+
+- Added Claude's `WebSearch` and `WebFetch` tools to the fixed read-only tool
+  surface so an independent consultation can research current external sources.
+- Kept Bash, Edit and Write unavailable and documented that search queries and
+  fetched URLs leave the local machine.
+
+### Validation
+
+- Added a command-construction regression test for the exact read and web tool
+  surface and the absence of Bash, Edit and Write.
+- Verified a live Fable 5 consultation can search the web and cite the source it
+  found without receiving a mutating tool.
+
 ## 2026-08-04: Public wrapper verification
 
 ### Added

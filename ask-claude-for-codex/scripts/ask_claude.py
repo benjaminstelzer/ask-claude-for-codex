@@ -15,7 +15,7 @@ from typing import Any
 
 
 EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
-READ_ONLY_TOOLS = "Read,Grep,Glob"
+READ_ONLY_TOOLS = "Read,Grep,Glob,WebSearch,WebFetch"
 MODEL_PATTERN = re.compile(r"^[A-Za-z0-9._:-]+$")
 SKILL_DIR = Path(__file__).resolve().parent.parent
 USER_CONFIG_PATH = SKILL_DIR / "config.json"
