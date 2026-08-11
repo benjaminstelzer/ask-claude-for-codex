@@ -6,8 +6,8 @@ A second opinion is useful only when it is actually a second opinion.
 
 Ask Claude for Codex is an Agent Skill that lets Codex consult the locally
 authenticated Claude Code CLI without leaving the current task. The Claude
-session is read-only and isolated from local Claude customizations by default;
-it can still persist across follow-up questions, because rebuilding the same
+session is read-only and isolated from local Claude customizations by default.
+It can still persist across follow-up questions, because rebuilding the same
 context for every objection is independence taken a little too literally.
 
 The default is **Fable 5 with high reasoning effort**. A request can select
@@ -94,7 +94,7 @@ Claude Code usage limits and model charges still apply.
 - **Advice without borrowed authority.** Claude cannot authorize edits, expand
   scope, accept a Decision, publish changes or override Codex instructions.
 - **An explicit data boundary.** Search queries and fetched URLs leave the
-  local machine; secrets and unrelated private data do not belong in prompts.
+  local machine. Secrets and unrelated private data do not belong in prompts.
 
 The complete contract is in
 [`SKILL.md`](ask-claude-for-codex/SKILL.md).
@@ -174,7 +174,7 @@ Ask Claude with my local customizations to review this plan.
 
 ### Safety boundary
 
-Read-only tools prevent direct Bash, Edit and Write use; they do not make
+Read-only tools prevent direct Bash, Edit and Write use. They do not make
 arbitrary content safe to disclose. Search queries and fetched URLs leave the
 local machine. Prompts must not contain credentials, tokens, private keys,
 secret-bearing URLs, private source text, or unrelated personal data.
@@ -198,7 +198,7 @@ The deterministic wrapper tests run on Linux and Windows. They cover UTF-8
 stream setup, Claude result parsing, error handling, configuration-error
 behavior, and the exact read-and-web tool surface without Bash, Edit, or Write.
 Live model quality still depends on the selected Claude model and the evidence
-available in the task; the wrapper can create distance, not omniscience.
+available in the task. The wrapper can create distance, not omniscience.
 
 ## Sources
 
@@ -211,4 +211,4 @@ available in the task; the wrapper can create distance, not omniscience.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
