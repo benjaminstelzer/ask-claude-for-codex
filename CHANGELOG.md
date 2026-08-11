@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-11: README voice and structure (v1.0.2)
+
+### Changed
+
+- Reworked the public README in Benjamin's voice while preserving the model,
+  effort, budget, persistence, customization, tool, and authority boundaries.
+- Aligned its section order with the Scoville project READMEs: purpose, use,
+  installation, contract, mechanism, related projects, status, sources, and
+  license.
+- Updated the Codex Skill-list description to use the same public voice.
+
+### Validation
+
+- The deterministic wrapper tests and Agent Skill package validation passed.
+- No live model-behavior benchmark was run because the Skill instructions and
+  wrapper behavior did not change.
+
 ## 2026-08-06: Read-only web research
 
 ### Fixed
