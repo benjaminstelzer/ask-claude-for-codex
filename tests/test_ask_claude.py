@@ -122,7 +122,7 @@ class AskClaudeTests(unittest.TestCase):
 
     def test_command_exposes_read_and_web_tools_but_no_mutating_tools(self) -> None:
         args = Namespace(
-            model="claude-fable-5",
+            model="claude-fable-5-1",
             effort="high",
             max_budget_usd=10,
             fresh=True,
@@ -136,12 +136,20 @@ class AskClaudeTests(unittest.TestCase):
 
         command = ask_claude.build_command(args, ["claude"])
         expected_tools = "Read,Grep,Glob,WebSearch,WebFetch"
+        self.assertEqual(command[command.index("--model") + 1], "claude-fable-5-1")
+        self.assertEqual(command[command.index("--effort") + 1], "high")
         self.assertEqual(command[command.index("--tools") + 1], expected_tools)
         self.assertEqual(
             command[command.index("--allowed-tools") + 1], expected_tools
         )
         for mutating_tool in ("Bash", "Edit", "Write"):
             self.assertNotIn(mutating_tool, expected_tools)
+
+    def test_shipped_defaults_select_fable_5_1_high(self) -> None:
+        config = ask_claude.load_config(ask_claude.DEFAULT_CONFIG_PATH)
+        self.assertEqual(config, ask_claude.FALLBACK_CONFIG)
+        self.assertEqual(config["model"], "claude-fable-5-1")
+        self.assertEqual(config["effort"], "high")
 
     def test_help_survives_a_configuration_error(self) -> None:
         with (

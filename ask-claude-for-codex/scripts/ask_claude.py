@@ -28,7 +28,7 @@ CONFIG_KEYS = {
     "customizations",
 }
 FALLBACK_CONFIG: dict[str, Any] = {
-    "model": "claude-fable-5",
+    "model": "claude-fable-5-1",
     "effort": "high",
     "max_budget_usd": 10,
     "session_persistence": True,

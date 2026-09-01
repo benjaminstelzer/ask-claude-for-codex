@@ -10,7 +10,7 @@ session is read-only and isolated from local Claude customizations by default.
 It can still persist across follow-up questions, because rebuilding the same
 context for every objection is independence taken a little too literally.
 
-The default is **Fable 5 with high reasoning effort**. A request can select
+The default is **Fable 5.1 with high reasoning effort**. A request can select
 another Claude model alias or full model ID, change the effort level and budget,
 or deliberately enable the local Claude setup.
 
@@ -47,7 +47,7 @@ Unless overridden, the Skill uses:
 
 | Setting | Default |
 | --- | --- |
-| Model | `claude-fable-5` |
+| Model | `claude-fable-5-1` |
 | Reasoning effort | `high` |
 | Budget ceiling | USD 10 |
 | Claude tools | `Read,Grep,Glob,WebSearch,WebFetch` |
@@ -78,8 +78,9 @@ directory so the final path is:
 <skills-dir>/ask-claude-for-codex/SKILL.md
 ```
 
-The Skill requires Python and an authenticated `claude` command on `PATH`.
-Claude Code usage limits and model charges still apply.
+The Skill requires Python and an authenticated Claude Code 2.1.255 or newer
+`claude` command on `PATH`. Claude Code usage limits and model charges still
+apply.
 
 ## What it enforces
 
@@ -113,7 +114,7 @@ available setting:
 
 ```json
 {
-  "model": "claude-fable-5",
+  "model": "claude-fable-5-1",
   "effort": "high",
   "max_budget_usd": 10,
   "session_persistence": true,

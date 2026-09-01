@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-01: Fable 5.1 default (v1.0.4)
+
+### Changed
+
+- Raised the shipped Claude default from Fable 5 to Fable 5.1 while preserving
+  `high` reasoning effort, the USD 10 budget ceiling, persistent sessions, and
+  safe mode.
+- Updated `config.default.json`, the wrapper fallback, Skill contract, README,
+  and regression coverage to request `claude-fable-5-1` consistently.
+
+### Validation
+
+- The deterministic wrapper tests and Agent Skill package validation passed.
+- A live default consultation on Claude Code 2.1.257 requested
+  `claude-fable-5-1` with `high` effort and returned successfully without
+  permission denials.
+
 ## 2026-08-11: README voice and structure (v1.0.2)
 
 ### Changed

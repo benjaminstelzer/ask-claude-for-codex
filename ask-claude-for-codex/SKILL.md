@@ -1,6 +1,6 @@
 ---
 name: ask-claude-for-codex
-description: Ask Claude Code from Codex for a read-only second opinion, review, critique, comparison, or alternative analysis through the local Claude CLI. Use when the user says "Frage Fable", "ask Claude", "ask Opus", requests a Claude, Fable, or Opus opinion, wants another model to inspect the current workspace, or invokes $ask-claude-for-codex. Accept a Claude model alias or full model ID and an effort level; default to Fable 5 with high effort.
+description: Ask Claude Code from Codex for a read-only second opinion, review, critique, comparison, or alternative analysis through the local Claude CLI. Use when the user says "Frage Fable", "ask Claude", "ask Opus", requests a Claude, Fable, or Opus opinion, wants another model to inspect the current workspace, or invokes $ask-claude-for-codex. Accept a Claude model alias or full model ID and an effort level; default to Fable 5.1 with high effort.
 ---
 
 # Ask Claude for Codex
@@ -13,7 +13,7 @@ Claude conversation by default so follow-up questions retain prior context.
 
 Use these values unless the user provides different ones:
 
-- Model: `claude-fable-5`
+- Model: `claude-fable-5-1`
 - Effort: `high`
 - Budget ceiling: USD 10
 - Tools: `Read,Grep,Glob,WebSearch,WebFetch`
@@ -29,6 +29,8 @@ configuration in this order: an explicit `--config <path>`, personal
 fallback values when neither file exists. A missing explicit `--config` path is
 an error. Command-line options change one invocation without modifying either
 configuration file.
+
+The Fable 5.1 default requires Claude Code 2.1.255 or newer.
 
 Accept `low`, `medium`, `high`, `xhigh` or `max` as effort values. Pass a
 user-supplied Claude model alias or full model ID unchanged. Map an unqualified
