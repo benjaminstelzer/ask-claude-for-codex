@@ -2,8 +2,6 @@
 
 A second opinion is useful only when it is actually a second opinion.
 
-[![Test](https://github.com/benjaminstelzer/ask-claude-for-codex/actions/workflows/test.yml/badge.svg)](https://github.com/benjaminstelzer/ask-claude-for-codex/actions/workflows/test.yml)
-
 Ask Claude for Codex is an Agent Skill that lets Codex consult the locally
 authenticated Claude Code CLI without leaving the current task. The Claude
 session is read-only and isolated from local Claude customizations by default.
