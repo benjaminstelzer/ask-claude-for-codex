@@ -54,6 +54,13 @@ def positive_amount(value: str) -> float:
     return amount
 
 
+def positive_timeout(value: str) -> float:
+    seconds = float(value)
+    if not math.isfinite(seconds) or seconds <= 0:
+        raise argparse.ArgumentTypeError("timeout seconds must be finite and greater than zero")
+    return seconds
+
+
 def model_name(value: str) -> str:
     if not MODEL_PATTERN.fullmatch(value):
         raise argparse.ArgumentTypeError(
@@ -170,6 +177,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "hard request budget ceiling "
             f"(config: {config['max_budget_usd']:g})"
         ),
+    )
+    parser.add_argument(
+        "--timeout-seconds",
+        type=positive_timeout,
+        default=None,
+        help="optional Claude process deadline in seconds (default: disabled)",
     )
     session_group = parser.add_mutually_exclusive_group()
     session_group.add_argument(
@@ -345,7 +358,13 @@ def run() -> int:
             encoding="utf-8",
             capture_output=True,
             check=False,
+            timeout=args.timeout_seconds,
         )
+    except subprocess.TimeoutExpired:
+        print(f"ask-claude: Claude deadline exceeded after {args.timeout_seconds:g} seconds. No automatic retry.", file=sys.stderr)
+        if args.resume:
+            print(f"ask-claude: Last known resume session: {args.resume}", file=sys.stderr)
+        return 124
     except OSError as error:
         print(f"ask-claude: failed to run Claude Code: {error}", file=sys.stderr)
         return 1
@@ -371,6 +390,11 @@ def run() -> int:
         )
         return 1
 
+    answer = claude_result.get("result")
+    if not isinstance(answer, str) or not answer.strip():
+        print("ask-claude: Claude returned no answer", file=sys.stderr)
+        return 1
+
     output = {
         "config_path": (
             str(args.config_path.resolve()) if args.config_path is not None else None
@@ -385,7 +409,7 @@ def run() -> int:
         "duration_ms": optional_field(claude_result, "duration_ms"),
         "total_cost_usd": optional_field(claude_result, "total_cost_usd"),
         "permission_denials": claude_result.get("permission_denials") or [],
-        "answer": claude_result.get("result"),
+        "answer": answer,
     }
     print(json.dumps(output, ensure_ascii=False, indent=2))
     return 0

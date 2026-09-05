@@ -40,7 +40,7 @@ class AskClaudeTests(unittest.TestCase):
         )
         stderr = io.StringIO()
         with (
-            mock.patch.object(ask_claude, "parse_args", return_value=object()),
+            mock.patch.object(ask_claude, "parse_args", return_value=Namespace(timeout_seconds=None)),
             mock.patch.object(ask_claude, "read_prompt", return_value="prompt"),
             mock.patch.object(
                 ask_claude,

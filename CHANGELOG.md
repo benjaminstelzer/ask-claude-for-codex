@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased - 2026-09-05 audit fixes
+
+- Shortened the README, moved contributor layout notes to docs/maintenance.md, and made agent installation the primary path. Safety and evidence limits remain explicit.
+- Rejected missing, blank, or non-text Claude answers instead of reporting success.
+- Documented the standalone package and development-test layout and removed generated working caches.
+- Added the optional --timeout-seconds CLI setting, disabled by default. Expiry returns exit 124 without retry or budget escalation.
+- Documented direct-child termination limits and removed the retired system-prompt link.
+- Included the repository license in the copied package. All 20 tests passed on Windows and WSL Ubuntu without a provider call.
+
 ## 2026-09-01: Fable 5.1 default (v1.0.4)
 
 ### Changed

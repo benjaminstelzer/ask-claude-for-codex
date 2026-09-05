@@ -36,11 +36,11 @@ $ask-claude-for-codex Review this implementation plan with the defaults.
 ```
 
 ```text
-Ask Opus 5 with max reasoning to challenge this architecture.
+Ask Claude using model alias opus with max effort to challenge this architecture.
 ```
 
 ```text
-Frage Fable, ob dieser Fix die eigentliche Ursache behebt.
+Ask Fable whether this fix addresses the root cause.
 ```
 
 Unless overridden, the Skill uses:
@@ -63,24 +63,20 @@ Skill invocation.
 
 ## Install
 
-The repository contains one installable Agent Skill directory. Usually, let
-Codex install it with this prompt:
+In a local Codex session, ask:
 
 ```text
-Install this Agent Skill from GitHub and make it available for all my projects:
+Install this Agent Skill for all my projects from this exact package directory:
 https://github.com/benjaminstelzer/ask-claude-for-codex/tree/main/ask-claude-for-codex
+Preserve existing customizations and ask before overwriting conflicting files.
+Report the installed location and whether the host discovers the Skill.
 ```
 
-For a manual installation, copy the repository's `ask-claude-for-codex/`
-directory so the final path is:
+The agent needs source access and permission to write to its personal Skills
+location. Manual fallback: [Codex Skills guide](https://learn.chatgpt.com/docs/build-skills).
 
-```text
-<skills-dir>/ask-claude-for-codex/SKILL.md
-```
-
-The Skill requires Python and an authenticated Claude Code 2.1.255 or newer
-`claude` command on `PATH`. Claude Code usage limits and model charges still
-apply.
+Requires Python 3.9 or newer and an authenticated Claude Code 2.1.255 or newer.
+Claude usage limits and model charges apply.
 
 ## What it enforces
 
@@ -102,87 +98,51 @@ The complete contract is in
 
 ## How it works
 
-The wrapper starts Claude Code with the selected model, effort, budget and
-fixed tool list. Its configuration, conversation state and customization mode
-are separate concerns: changing one does not quietly change the others.
+The adapter starts Claude Code with the selected model, effort, budget, and
+fixed tool list. It reports an answer only when Claude returns a usable result.
+Missing, blank, or malformed answers remain errors.
 
 ### Configuration
 
-The shipped
-[`config.default.json`](ask-claude-for-codex/config.default.json) contains every
-available setting:
+For personal defaults, copy [config.default.json](ask-claude-for-codex/config.default.json)
+to `config.json` beside it. This ignored personal file overrides the shipped
+defaults. Without either file, the same defaults remain available internally.
 
-```json
-{
-  "model": "claude-fable-5-1",
-  "effort": "high",
-  "max_budget_usd": 10,
-  "session_persistence": true,
-  "customizations": false
-}
-```
+The fields are `model`, `effort`, `max_budget_usd`, `session_persistence`, and
+`customizations`. For a one-off override, name the model, effort, or budget in
+the request instead of editing the file.
 
-To change permanent behavior, copy `config.default.json` to `config.json` in
-the same directory and edit the personal file. It is ignored by Git and takes
-precedence over the shipped defaults. Without either file, the same defaults
-remain available as an internal fallback.
+### Follow-ups
 
-| Setting | Meaning |
-| --- | --- |
-| `model` | Claude model alias or full model ID |
-| `effort` | Reasoning effort: `low`, `medium`, `high`, `xhigh` or `max` |
-| `max_budget_usd` | Maximum spend for one consultation |
-| `session_persistence` | Whether Claude conversations are saved for follow-up questions |
-| `customizations` | Whether Claude uses the local Claude setup or starts as an isolated second opinion |
+Conversations are saved by default, so follow-ups in the same Codex task retain
+the earlier exchange. Ask for a new conversation when the topic changes, or a
+fresh stateless consultation when it should not be saved. Persistence grants
+no additional tools or permissions.
 
-For a one-time change, put the choice in the request instead of editing the
-file:
+### Optional Claude deadline
 
-```text
-Ask Opus 5 with max reasoning and a USD 3 budget to review this architecture.
-```
+The optional `--timeout-seconds <positive-number>` applies to one Claude call
+and is disabled by default. Expiry returns exit 124 without an automatic retry,
+budget increase, or success answer. A known resume ID survives the error, but an
+interrupted turn is not guaranteed to be saved.
 
-### Conversations
+It terminates and waits for the direct child, not a whole process tree or remote
+job. Startup and inherited pipes can delay return. Synthetic direct-child tests
+passed on Windows and WSL Ubuntu. Live provider cancellation was not tested.
 
-The first consultation starts a saved Claude conversation by default.
-Follow-up questions in the same Codex task continue it, so Claude retains the
-earlier exchange. Ask for a new conversation when the topic changes, or ask for
-a fresh, stateless consultation when the exchange should not be saved.
+### Customizations and safety
 
-Session persistence stores the conversation. Customizations control the
-environment Claude uses. They are independent.
+Safe mode disables local Claude instructions, Skills, plugins, hooks, MCP
+servers, and custom commands. Enable `customizations` only when the consultation
+needs that setup. The adapter still withholds built-in Bash, Edit, and Write,
+but extensions and hooks can introduce side effects outside that boundary.
 
-### Claude customizations
+Read-only tools do not make private content safe to disclose. Queries and URLs
+leave the machine. Do not include credentials, keys, secret-bearing URLs,
+private source text, or unrelated personal data in the consultation.
 
-With `customizations` set to `false`, Claude starts in safe mode. It does not
-load `CLAUDE.md` files, project instructions, Claude Skills, plugins, hooks,
-MCP servers or custom commands. This is the default because it produces a more
-independent second opinion than asking the existing setup to admire its own
-homework.
-
-With `customizations` set to `true`, Claude can use that local setup. Enable it
-when the consultation should follow Claude-specific project instructions, use
-a configured Claude Skill or include context from an MCP server. The wrapper
-still withholds Claude's built-in Bash, Edit and Write tools. Configured hooks,
-plugins or MCP servers can introduce their own behavior or side effects, so
-enabling customizations deliberately reduces isolation.
-
-For one consultation, say so in the request:
-
-```text
-Ask Claude with my local customizations to review this plan.
-```
-
-### Safety boundary
-
-Read-only tools prevent direct Bash, Edit and Write use. They do not make
-arbitrary content safe to disclose. Search queries and fetched URLs leave the
-local machine. Prompts must not contain credentials, tokens, private keys,
-secret-bearing URLs, private source text, or unrelated personal data.
-
-Conversation persistence grants no additional tools or permissions. When
-customizations are enabled, their configured hooks and extensions remain
-outside the built-in tool boundary.
+Repository structure and contributor detail are in the
+[maintenance notes](docs/maintenance.md).
 
 ## Related projects
 
@@ -190,16 +150,15 @@ outside the built-in tool boundary.
   keeps implementation, scope and validation with Codex after the consultation.
 - [Scoville Scribe](https://github.com/benjaminstelzer/scoville-scribe-anti-ai-slop)
   protects meaning and terminology when the second opinion concerns writing.
-- [Codex, Fable-calibrated style](https://github.com/benjaminstelzer/codex-fable-like-system-prompt-for-gpt-5.6-sol)
-  supplies the broader collaboration style used by my Codex setup.
 
 ## Status
 
-The deterministic wrapper tests run on Linux and Windows. They cover UTF-8
-stream setup, Claude result parsing, error handling, configuration-error
-behavior, and the exact read-and-web tool surface without Bash, Edit, or Write.
-Live model quality still depends on the selected Claude model and the evidence
-available in the task. The wrapper can create distance, not omniscience.
+Deterministic adapter tests cover configuration, UTF-8, result parsing,
+explicit error handling, the fixed read-and-web tool surface, and synthetic
+deadlines on Windows and WSL Ubuntu. Live cancellation was not tested.
+
+Model quality depends on the selected Claude model and available evidence.
+The adapter can create distance, not omniscience.
 
 ## Sources
 
@@ -212,4 +171,4 @@ available in the task. The wrapper can create distance, not omniscience.
 
 ## License
 
-MIT - see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
