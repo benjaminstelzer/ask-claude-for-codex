@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased - 2026-09-05 audit fixes
+## v1.1.0 - 2026-09-05
 
 - Shortened the README, moved contributor layout notes to docs/maintenance.md, and made agent installation the primary path. Safety and evidence limits remain explicit.
 - Rejected missing, blank, or non-text Claude answers instead of reporting success.
