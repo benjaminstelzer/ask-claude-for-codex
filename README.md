@@ -140,7 +140,7 @@ leave the machine. Do not include credentials, keys, secret-bearing URLs,
 private source text, or unrelated personal data in the consultation.
 
 Repository structure and contributor detail are in the
-[maintenance notes](docs/maintenance.md).
+[maintenance notes](development/docs/maintenance.md).
 
 ## Related projects
 
@@ -158,13 +158,15 @@ deadlines on Windows and WSL Ubuntu. Live cancellation was not tested.
 Model quality depends on the selected Claude model and available evidence.
 The adapter can create distance, not omniscience.
 
+Repository development and the current path mapping are in [development/](development/README.md).
+
 ## Sources
 
 - [`SKILL.md`](ask-claude-for-codex/SKILL.md) defines activation, authority and
   the consultation workflow.
 - [`ask_claude.py`](ask-claude-for-codex/scripts/ask_claude.py) implements the
   Claude Code wrapper.
-- [`test_ask_claude.py`](tests/test_ask_claude.py) defines the deterministic
+- [`test_ask_claude.py`](development/tests/test_ask_claude.py) defines the deterministic
   regression coverage.
 
 ## License

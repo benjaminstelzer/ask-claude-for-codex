@@ -11,7 +11,7 @@ from unittest import mock
 
 
 SCRIPT_PATH = (
-    Path(__file__).resolve().parents[1]
+    Path(__file__).resolve().parents[2]
     / "ask-claude-for-codex"
     / "scripts"
     / "ask_claude.py"
