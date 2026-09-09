@@ -63,6 +63,8 @@ Skill invocation.
 
 Codex only (CLI, Desktop app, IDE extension); the sole host this Skill was developed for. Requires Python 3.9+, an installed and authenticated Claude Code CLI 2.1.255+ on PATH or a configured path, shell access and network for Claude's WebSearch/WebFetch. Instructions are PowerShell-first; bash equivalents apply on macOS and Linux.
 
+Claude usage limits and model charges apply.
+
 ## Install
 
 In a local Codex session, ask:
@@ -76,9 +78,6 @@ Report the installed location and whether the host discovers the Skill.
 
 The agent needs source access and permission to write to its personal Skills
 location. Manual fallback: [Codex Skills guide](https://learn.chatgpt.com/docs/build-skills).
-
-Requires Python 3.9 or newer and an authenticated Claude Code 2.1.255 or newer.
-Claude usage limits and model charges apply.
 
 ## What it enforces
 
