@@ -1,6 +1,7 @@
 ---
 name: ask-claude-for-codex
 description: Ask Claude Code from Codex for a read-only second opinion, review, critique, comparison, or alternative analysis through the local Claude CLI. Use when the user says "Frage Fable", "ask Claude", "ask Opus", requests a Claude, Fable, or Opus opinion, wants another model to inspect the current workspace, or invokes $ask-claude-for-codex. Accept a Claude model alias or full model ID and an effort level; default to Fable 5.1 with high effort.
+compatibility: "Codex only (CLI, Desktop app, IDE extension); the sole host this Skill was developed for. Requires Python 3.9+, an installed and authenticated Claude Code CLI 2.1.255+ on PATH or a configured path, shell access and network for Claude's WebSearch/WebFetch. Instructions are PowerShell-first; bash equivalents apply on macOS and Linux."
 ---
 
 # Ask Claude for Codex
