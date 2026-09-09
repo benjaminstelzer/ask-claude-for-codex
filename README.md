@@ -59,6 +59,10 @@ Model values are passed to Claude Code as aliases or full IDs. For example,
 Explicit `$ask-claude-for-codex` invocation works on hosts that support named
 Skill invocation.
 
+## Compatibility
+
+Codex only (CLI, Desktop app, IDE extension); the sole host this Skill was developed for. Requires Python 3.9+, an installed and authenticated Claude Code CLI 2.1.255+ on PATH or a configured path, shell access and network for Claude's WebSearch/WebFetch. Instructions are PowerShell-first; bash equivalents apply on macOS and Linux.
+
 ## Install
 
 In a local Codex session, ask:
