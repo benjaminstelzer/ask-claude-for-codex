@@ -142,8 +142,7 @@ Read-only tools do not make private content safe to disclose. Queries and URLs
 leave the machine. Do not include credentials, keys, secret-bearing URLs,
 private source text, or unrelated personal data in the consultation.
 
-Repository structure and contributor detail are in the
-[maintenance notes](development/docs/maintenance.md).
+Repository validation and retention rules are in [development](development/README.md).
 
 ## Related projects
 
@@ -160,8 +159,6 @@ deadlines on Windows and WSL Ubuntu. Live cancellation was not tested.
 
 Model quality depends on the selected Claude model and available evidence.
 The adapter can create distance, not omniscience.
-
-Repository development and the current path mapping are in [development/](development/README.md).
 
 ## Sources
 
