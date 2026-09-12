@@ -10,7 +10,7 @@ Run the deterministic adapter suite from the repository root:
 python -B -m unittest discover -s development/tests -v
 ```
 
-Also check Skill frontmatter, UI metadata, JSON configuration, relative links, and package structure. Static tests do not prove live Claude availability, cancellation behavior, or model quality.
+Static tests do not prove live Claude availability, cancellation behavior, or model quality.
 
 ## Retention
 

@@ -144,6 +144,21 @@ private source text, or unrelated personal data in the consultation.
 
 Repository validation and retention rules are in [development](development/README.md).
 
+## How it was developed
+
+This Skill grew through practical second-opinion work and the failures around
+it. Windows prompt handling needed to preserve UTF-8, an apparently successful
+CLI exit could still contain an error, and a blank answer could not count as a
+result. Those cases became explicit checks in the
+[adapter tests](development/tests/test_ask_claude.py).
+
+I keep using the Skill and examining complete task histories to find where
+consultations help, where they fail, and where rebuilding context or repeating
+work spends tokens without improving the answer. The
+[changelog](CHANGELOG.md) follows those revisions, including persistent
+follow-ups and optional deadlines. Synthetic deadline tests do not establish
+live provider cancellation.
+
 ## Related projects
 
 - [Scoville Code](https://github.com/benjaminstelzer/scoville-code-anti-ai-slop)
@@ -172,18 +187,3 @@ The adapter can create distance, not omniscience.
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-## How it was developed
-
-This Skill grew through practical second-opinion work and the failures around
-it. Windows prompt handling needed to preserve UTF-8, an apparently successful
-CLI exit could still contain an error, and a blank answer could not count as a
-result. Those cases became explicit checks in the
-[adapter tests](development/tests/test_ask_claude.py).
-
-I keep using the Skill and examining complete task histories to find where
-consultations help, where they fail, and where rebuilding context or repeating
-work spends tokens without improving the answer. The
-[changelog](CHANGELOG.md) follows those revisions, including persistent
-follow-ups and optional deadlines. Synthetic deadline tests do not establish
-live provider cancellation.
