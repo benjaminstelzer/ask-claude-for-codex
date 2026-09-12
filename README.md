@@ -5,8 +5,8 @@ A second opinion is useful only when it is actually a second opinion.
 Ask Claude for Codex is an Agent Skill that lets Codex consult the locally
 authenticated Claude Code CLI without leaving the current task. The Claude
 session is read-only and isolated from local Claude customizations by default.
-It can still persist across follow-up questions, because rebuilding the same
-context for every objection is independence taken a little too literally.
+You can continue the same conversation for follow-up questions without
+rebuilding its context each time.
 
 The default is **Fable 5.1 with high reasoning effort**. A request can select
 another Claude model alias or full model ID, change the effort level and budget,
@@ -21,9 +21,8 @@ instructions, plugins and project framing is not as independent as the phrase
 default, gives it a fixed read-only tool surface, and makes the remaining
 choices explicit.
 
-Claude's answer is still advice. Codex must verify it before the answer becomes
-an edit, a decision, or the wonderfully confident announcement that everything
-is now fixed.
+Claude's answer is still advice. Codex needs to verify it before making a
+change or treating a problem as solved.
 
 ## How to use
 
@@ -127,9 +126,8 @@ and is disabled by default. Expiry returns exit 124 without an automatic retry,
 budget increase, or success answer. A known resume ID survives the error, but an
 interrupted turn is not guaranteed to be saved.
 
-It terminates and waits for the direct child, not a whole process tree or remote
-job. Startup and inherited pipes can delay return. Synthetic direct-child tests
-passed on Windows and WSL Ubuntu. Live provider cancellation was not tested.
+The deadline terminates the direct child process. It does not guarantee that
+remote work stops, and startup or inherited pipes can delay return.
 
 ### Customizations and safety
 
@@ -142,22 +140,19 @@ Read-only tools do not make private content safe to disclose. Queries and URLs
 leave the machine. Do not include credentials, keys, secret-bearing URLs,
 private source text, or unrelated personal data in the consultation.
 
-Repository validation and retention rules are in [development](development/README.md).
-
 ## How it was developed
 
-This Skill grew through practical second-opinion work and the failures around
-it. Windows prompt handling needed to preserve UTF-8, an apparently successful
-CLI exit could still contain an error, and a blank answer could not count as a
-result. Those cases became explicit checks in the
-[adapter tests](development/tests/test_ask_claude.py).
+This Skill grew through practical second-opinion work. Some of the useful
+corrections were quite concrete: PowerShell could damage non-ASCII prompt text,
+a successful CLI exit could still contain an error, and a blank answer could
+be mistaken for a result. The [adapter tests](development/tests/test_ask_claude.py)
+keep those cases reproducible.
 
-I keep using the Skill and examining complete task histories to find where
-consultations help, where they fail, and where rebuilding context or repeating
-work spends tokens without improving the answer. The
-[changelog](CHANGELOG.md) follows those revisions, including persistent
-follow-ups and optional deadlines. Synthetic deadline tests do not establish
-live provider cancellation.
+I also read the complete consultation histories. They show where Claude's
+answer helped and where rebuilding context or repeating a question added cost
+without adding anything to the answer. Persistent follow-ups and optional
+deadlines came through that development. The [changelog](CHANGELOG.md) records
+the changes.
 
 ## Related projects
 
@@ -165,15 +160,6 @@ live provider cancellation.
   keeps implementation, scope and validation with Codex after the consultation.
 - [Scoville Scribe](https://github.com/benjaminstelzer/scoville-scribe-anti-ai-slop)
   protects meaning and terminology when the second opinion concerns writing.
-
-## Status
-
-Deterministic adapter tests cover configuration, UTF-8, result parsing,
-explicit error handling, the fixed read-and-web tool surface, and synthetic
-deadlines on Windows and WSL Ubuntu. Live cancellation was not tested.
-
-Model quality depends on the selected Claude model and available evidence.
-The adapter can create distance, not omniscience.
 
 ## Sources
 
